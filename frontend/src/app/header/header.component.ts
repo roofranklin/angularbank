@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { AccountStateService } from '../core/services/account-state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../core/services/auth.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-header',
@@ -19,7 +20,9 @@ export class HeaderComponent {
   accountName = 'Cliente';
   isLight = false;
 
-  constructor() {
+  constructor(
+    private readonly translate: TranslateService,
+  ) {
     this.accountState.account$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((account) => {
@@ -33,6 +36,10 @@ export class HeaderComponent {
       this.isLight = false;
     }
     this.applyTheme();
+  }
+
+  mudarIdioma(idioma: string) {
+    this.translate.use(idioma);
   }
 
   toggleTheme() {

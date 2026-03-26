@@ -5,5 +5,12 @@
         "LOAN": "Empréstimos",
         "TRANSACTIONS": "Transações",
         "PROFILE": "Perfil"
+    },
+    "DASHBOARD": {
+        "SALDO_DISPONIVEL": "Saldo Disponível",
+        "VALOR_EMPRESTIMO": "valor do Empréstimo",
+        "FATURA_CARTAO": "Fatura do Cartão",
+        "VER_FATURAS": "Ver faturas",
+        "ULTIMAS_TRANSACOES": "Últimas Transações"
     }
 }

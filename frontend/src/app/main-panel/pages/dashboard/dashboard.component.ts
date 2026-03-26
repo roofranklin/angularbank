@@ -14,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CreditCardInvoiceComponent } from './components/credit-card-invoice/credit-card-invoice.component';
 import { DashboardService } from './services/dashboard.service';
 import { Account } from './models/account.model';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @Component({
@@ -29,6 +30,7 @@ import { Account } from './models/account.model';
     MatSortModule,
     MatIconModule,
     CreditCardInvoiceComponent,
+    TranslateModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',

@@ -19,9 +19,9 @@ export class AppComponent implements OnInit {
   ) {
     this.translate.addLangs(['pt-br', 'pt-pt']);
     this.translate.setFallbackLang(environment.defaultLang);
-    this.translate.use(environment.defaultLang);
+    const browserLang = this.translate.getBrowserCultureLang();
+    this.translate.use(browserLang?.match(/pt-br|pt-pt/) ? browserLang : environment.defaultLang);
   }
-
 
   ngOnInit(): void {
     this.accountState.loadInitial();

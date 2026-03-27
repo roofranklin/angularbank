@@ -4,7 +4,7 @@ import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { provideEnvironmentNgxMask } from 'ngx-mask';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withPreloading, PreloadAllModules } from '@angular/router';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { TranslateModule } from '@ngx-translate/core';
@@ -13,7 +13,7 @@ import { provideTranslateHttpLoader } from '@ngx-translate/http-loader'
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+    provideRouter(routes, withPreloading(PreloadAllModules)),
     provideHttpClient(
       withInterceptors([authInterceptor])
     ),

@@ -1,4 +1,5 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, DestroyRef, inject, Inject, PLATFORM_ID } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AccountStateService } from '../core/services/account-state.service';
@@ -19,23 +20,28 @@ export class HeaderComponent {
 
   accountName = 'Cliente';
   isLight = false;
+  private isBrowser: boolean;
 
   constructor(
     private readonly translate: TranslateService,
+    @Inject(PLATFORM_ID) platformId: object,
   ) {
+    this.isBrowser = isPlatformBrowser(platformId);
     this.accountState.account$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((account) => {
         this.accountName = account?.name ?? 'Cliente';
       });
 
-    try {
-      const stored = localStorage.getItem('theme');
-      this.isLight = stored === 'light';
-    } catch (e) {
-      this.isLight = false;
+    if (this.isBrowser) {
+      try {
+        const stored = localStorage.getItem('theme');
+        this.isLight = stored === 'light';
+      } catch (e) {
+        this.isLight = false;
+      }
+      this.applyTheme();
     }
-    this.applyTheme();
   }
 
   mudarIdioma(idioma: string) {
@@ -44,10 +50,12 @@ export class HeaderComponent {
 
   toggleTheme() {
     this.isLight = !this.isLight;
-    try {
-      localStorage.setItem('theme', this.isLight ? 'light' : 'dark');
-    } catch (e) {}
-    this.applyTheme();
+    if (this.isBrowser) {
+      try {
+        localStorage.setItem('theme', this.isLight ? 'light' : 'dark');
+      } catch (e) {}
+      this.applyTheme();
+    }
   }
 
   logout() {
@@ -55,8 +63,10 @@ export class HeaderComponent {
   }
 
   private applyTheme() {
-    const root = document.documentElement;
-    if (this.isLight) root.classList.add('light');
-    else root.classList.remove('light');
+    if (this.isBrowser) {
+      const root = document.documentElement;
+      if (this.isLight) root.classList.add('light');
+      else root.classList.remove('light');
+    }
   }
 }

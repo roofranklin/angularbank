@@ -1,9 +1,16 @@
-import { Component, DestroyRef, EventEmitter, inject, OnInit, Output } from '@angular/core';
+import { 
+  Component, 
+  DestroyRef, 
+  EventEmitter, 
+  inject, 
+  OnInit, 
+  Output, 
+  signal 
+} from '@angular/core';
 import { first } from 'rxjs';
 import { Transaction } from '../../models/transaction.model';
+import { Router } from '@angular/router';
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { RouterService } from '../../../../../core/services/router.service';
-import { TransactionPagesEnum } from '../../constants/transaction-pages.enum';
 import { FormsModule } from '@angular/forms';
 import { AccountStateService } from '../../../../../core/services/account-state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -11,6 +18,8 @@ import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmDeleteDialogComponent } from '../confirm-delete-dialog/confirm-delete-dialog.component';
+import { TransactionsService } from '../../services/transactions.service';
+import { CreateTransactionComponent } from '../create-transaction/create-transaction.component';
 
 @Component({
   selector: 'app-list-transactions',
@@ -27,13 +36,14 @@ import { ConfirmDeleteDialogComponent } from '../confirm-delete-dialog/confirm-d
 })
 export class ListTransactionsComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
-  private readonly routerService = inject(RouterService);
+  private readonly router = inject(Router);
   private readonly accountState = inject(AccountStateService);
   private readonly dialog = inject(MatDialog);
+  private transactionsService = inject(TransactionsService);
 
   @Output() editEmitter = new EventEmitter<string>();
 
-  transactions: Transaction[] = [];
+  transactions = signal<Transaction[]>([]);
   searchTerm = '';
   accountBalance = 0;
   sortState: Sort = { active: 'date', direction: 'desc' };
@@ -41,10 +51,10 @@ export class ListTransactionsComponent implements OnInit {
   get filteredTransactions(): Transaction[] {
     const normalized = this.searchTerm.trim().toLowerCase();
     if (!normalized) {
-      return this.transactions;
+      return this.transactions();
     }
 
-    return this.transactions.filter((item) => {
+    return this.transactions().filter((item) => {
       const date = new Date(item.date).toLocaleDateString('pt-BR');
       return (
         item.description.toLowerCase().includes(normalized) ||
@@ -58,7 +68,7 @@ export class ListTransactionsComponent implements OnInit {
   }
 
   get totalExpense(): number {
-    return this.transactions
+    return this.transactions()
       .filter((item) => item.amount < 0)
       .reduce((sum, item) => sum + Math.abs(item.amount), 0);
   }
@@ -68,54 +78,60 @@ export class ListTransactionsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadTransactions();
     this.accountState.account$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((account) => {
         this.accountBalance = account?.balance || 0;
       });
-
-    this.accountState.transactions$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((transactions) => {
-        this.transactions = transactions;
-      });
   }
 
-  redirectToCreate(): void {
-    this.routerService.setTransactionPage(TransactionPagesEnum.CREATE);
+  loadTransactions(): void {
+    this.transactionsService.getTransactions().subscribe({
+      next: (data) => this.transactions.set(data),
+      error: (err) => console.error(err),
+    });
+  }
+
+  openCreateTransactionDialog(): void {
+    this.dialog
+      .open(CreateTransactionComponent, {
+        width: '420px',
+      })
+      .afterClosed()
+      .pipe(first())
+      .subscribe((result) => {
+        if (result) {
+          this.loadTransactions();
+        }
+      }
+    );
   }
 
   onEdit(id: string): void {
-    this.editEmitter.emit(id);
+    this.router.navigate([`/transacoes/editar/${id}`]);
   }
 
   onDelete(id: string): void {
-    const transactionToDelete = this.transactions.find((item) => item.id === id);
+    const transactionToDelete = this.transactions().find((item) => item.id === id);
     if (!transactionToDelete) {
       return;
     }
 
-    const deletedAmount = transactionToDelete?.amount ?? 0;
-
     this.dialog
       .open(ConfirmDeleteDialogComponent, {
         width: '420px',
-        data: { description: transactionToDelete.description },
+        data: {
+          description: transactionToDelete.description,
+          id: transactionToDelete.id,
+        },
       })
       .afterClosed()
       .pipe(first())
       .subscribe((confirmed) => {
-        if (!confirmed) {
-          return;
+        if (confirmed) {
+          this.loadTransactions();
         }
-
-        this.accountState
-          .deleteTransactionWithBalance(id, deletedAmount)
-          .pipe(first())
-          .subscribe({
-            next: () => {},
-            error: () => {},
-          });
       });
   }
 

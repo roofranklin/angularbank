@@ -34,8 +34,8 @@
       <input formControlName="description" placeholder="Digite uma descrição (opcional)" />
     </div>
 
-    <button class="submit-btn" type="submit" [disabled]="loading || form.invalid">
-      {{ loading ? "Transferindo..." : "Transferir" }}
+    <button class="submit-btn" type="submit" [disabled]="isTransfering() || form.invalid">
+      {{ isTransfering() ? "Transferindo..." : "Transferir" }}
     </button>
 
     <div class="status">

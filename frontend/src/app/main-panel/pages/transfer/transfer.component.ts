@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AccountStateService } from '../../../core/services/account-state.service';
@@ -24,13 +24,14 @@ export class TransferComponent {
     description: [''],
   });
 
-  loading = false;
+  isTransfering = signal(false);
   error: string | null = null;
   success = false;
 
   submit(): void {
     this.error = null;
     this.success = false;
+    this.isTransfering.set(true);
     if (this.form.invalid) return;
 
     const destinationAccount = this.form.get('destinationAccount')!.value as string;
@@ -53,18 +54,18 @@ export class TransferComponent {
         return;
       }
 
-      this.loading = true;
       this.accountState.transfer(destinationAccount, amount, description)
         .subscribe({
           next: () => {
-            this.loading = false;
             this.success = true;
             this.form.reset();
           },
           error: (err) => {
-            this.loading = false;
             this.error = err?.message || 'Erro ao realizar transferência';
           },
+          complete: () => {
+            this.isTransfering.set(false);
+          }
         });
     });
   }

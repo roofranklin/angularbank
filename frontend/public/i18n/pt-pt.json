@@ -1,0 +1,16 @@
+{
+    "SIDEBAR": {
+        "DASHBOARD": "Painel Inicial",
+        "TRANSFER": "Transferência",
+        "LOAN": "Créditos",
+        "TRANSACTIONS": "Movimentos",
+        "PROFILE": "Perfil"
+    },
+    "DASHBOARD": {
+        "SALDO_DISPONIVEL": "Saldo Contabilístico",
+        "VALOR_EMPRESTIMO": "Valor do Crédito",
+        "FATURA_CARTAO": "Fatura do Cartão",
+        "VER_FATURAS": "Ver faturas",
+        "ULTIMAS_TRANSACOES": "Últimos Movimentos"
+    }
+}

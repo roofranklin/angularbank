@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Account } from '../models/account.model';
 
@@ -42,5 +42,20 @@ export class DashboardService {
         ),
       )
       .pipe(map((updated) => this.normalizeAccount(updated)));
+  }
+
+  updateBalance(newBalance: number): Observable<Account> {
+    const payload = {
+      balance: newBalance,
+      item: { balance: newBalance },
+    };
+    return this.http
+      .patch<Account>(`${this.apiUrl}/account`, payload)
+      .pipe(
+        catchError((err) => {
+          console.error(err);
+          return throwError(() => new Error('Erro ao atualizar o saldo'));
+        })
+      );
   }
 }

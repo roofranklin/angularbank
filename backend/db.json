@@ -3,8 +3,9 @@
     "item": {
       "id": 1,
       "name": "Cliente Especial",
-      "balance": 4838.50
-    }
+      "balance": 4838.5
+    },
+    "balance": 4608.5
   },
   "transactions": [
     {
@@ -153,8 +154,51 @@
       "description": "Conta de Água",
       "amount": -72,
       "type": "expense"
+    },
+    {
+      "id": "0344",
+      "date": "2026-03-10T03:00:00.000Z",
+      "description": "Teste",
+      "amount": 200,
+      "type": "income"
+    },
+    {
+      "id": "1225",
+      "date": "2026-03-19",
+      "description": "teste",
+      "amount": 200,
+      "type": "income"
+    },
+    {
+      "id": "1773959020558",
+      "date": "2026-03-19T22:23:40.558Z",
+      "description": "Transferência para Conta Corrente 0012 - teste",
+      "amount": -200,
+      "type": "expense"
+    },
+    {
+      "id": "1773959406166",
+      "date": "2026-03-19T22:30:06.166Z",
+      "description": "Transferência para Conta Corrente 0012 - aaa",
+      "amount": -300,
+      "type": "expense"
+    },
+    {
+      "id": "1773959434070",
+      "date": "2026-03-19T22:30:34.070Z",
+      "description": "Transferência para Conta Corrente 0012 - teste",
+      "amount": -120,
+      "type": "expense"
+    },
+    {
+      "id": "1773959530999",
+      "date": "2026-03-19T22:32:10.999Z",
+      "description": "Transferência para Conta Corrente 0012 - eee",
+      "amount": -230,
+      "type": "expense"
     }
   ],
   "transfers": [],
-  "loans": []
+  "loans": [],
+  "$schema": "./node_modules/json-server/schema.json"
 }

@@ -1,4 +1,5 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal, effect } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { Transaction } from '../transactions/models/transaction.model';
 import { DatePipe } from '@angular/common';
@@ -10,7 +11,11 @@ import { AccountStateService } from '../../../core/services/account-state.servic
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatIconModule } from '@angular/material/icon';
-import { AsyncPipe } from '@angular/common';
+import { CreditCardInvoiceComponent } from './components/credit-card-invoice/credit-card-invoice.component';
+import { DashboardService } from './services/dashboard.service';
+import { Account } from './models/account.model';
+import { TranslateModule } from '@ngx-translate/core';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -24,7 +29,8 @@ import { AsyncPipe } from '@angular/common';
     DecimalPipe,
     MatSortModule,
     MatIconModule,
-    AsyncPipe
+    CreditCardInvoiceComponent,
+    TranslateModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
@@ -32,12 +38,26 @@ import { AsyncPipe } from '@angular/common';
 export class DashboardComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly accountState = inject(AccountStateService);
+  private readonly dashboardService = inject(DashboardService);
 
-  account$ = this.accountState.account$;
+  accountData = toSignal<Account | undefined>(this.dashboardService.getAccount(), {initialValue: undefined});
+
   transactions: Transaction[] = [];
 
   search: string = '';
   sortState: Sort = { active: 'date', direction: 'desc' };
+
+  isBalanceVisible = signal(true);
+
+  constructor() {
+    effect(() => {
+      console.log('A visibilidade doextrato mudou para:', this.isBalanceVisible());
+    });
+  }
+
+  toogleBalance(): void {
+    this.isBalanceVisible.update((visible) => !visible);
+  }
 
   get totalIncome(): number {
     return this.transactions

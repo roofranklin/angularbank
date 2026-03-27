@@ -1,16 +1,24 @@
 <div class="dashboard-root">
   <header class="dashboard-hero">
-    <h2>Bem-vindo, {{ (account$ | async)?.name || 'Cliente' }}!</h2>
+    <h2>Bem-vindo, {{ accountData()?.name || 'Cliente' }}!</h2>
 
     <div class="hero-cards">
       <div class="hero-card">
         <div class="hero-card-top">
-          <div class="muted">Saldo em Conta</div>
+          <div class="muted">{{ 'DASHBOARD.SALDO_DISPONIVEL' | translate }}</div>
         </div>
         <div class="big">
-          R$ {{ (account$ | async)?.balance | number:'1.2-2' }}
-        </div>   
+          @if (isBalanceVisible()) {
+            R$ {{ accountData()?.balance | number:'1.2-2' }}
+          } @else {
+            R$ *****
+          }
+        </div>  
+        <button (click)="toogleBalance()" aria-label="Toggle balance visibility">
+          {{ isBalanceVisible() ? 'Esconder Saldo' : 'Mostrar Saldo' }}
+        </button>
       </div>
+       
 
       <div class="hero-card muted-card">
         <div class="hero-card-top">
@@ -38,7 +46,7 @@
 
   <section class="content card">
     <div class="content-header">
-      <h3>Últimas Transações</h3>
+      <h3>{{ 'DASHBOARD.ULTIMAS_TRANSACOES' | translate}}</h3>
       <div class="muted summary-text">Resumo das movimentações recentes</div>
     </div>
 
@@ -75,4 +83,18 @@
       </table>
     </div>
   </section>
+
+  @defer (on interaction(loadButton)) {
+    <app-credit-card-invoice></app-credit-card-invoice>
+  }
+  @placeholder {
+    <div #loadButton class="loading-placeholder" style="color: goldenrod; cursor: pointer;" >
+      Clique para ver a fatura do cartão de crédito
+    </div>
+  }
+  @loading (minimum 2s) {
+    <div class="loading-placeholder" style="color: goldenrod;">
+      Carregando fatura do cartão de crédito...
+    </div>
+  }
 </div>
